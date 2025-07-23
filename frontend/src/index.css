@@ -1,0 +1,20 @@
+@font-face {
+  font-family: 'NewYork';
+  src: url('/NewYork.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+} 
+
+@font-face {
+  font-family: 'Allenoire';
+  src: url('/Allenoire.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+
+html, body, #root {
+  margin: 0;
+  padding: 0;
+  font-family: 'Allenoire', sans-serif;
+}

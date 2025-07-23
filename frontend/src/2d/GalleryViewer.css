@@ -1,0 +1,103 @@
+/* /* FlatGallery.css */ */
+/* html, body, #root { */
+/*   margin: 0; */
+/*   height: 100%; */
+/*   overflow: hidden; */
+/*   background: #111; */
+/*   font-family: sans-serif; */
+/* } */
+/**/
+/* .flat-gallery-wrapper { */
+/*   width: 100vw; */
+/*   height: 100vh; */
+/*   display: flex; */
+/*   justify-content: center; */
+/*   align-items: center; */
+/*   perspective: 1000px; */
+/*   background: #111; */
+/* } */
+/**/
+/* .flat-gallery { */
+/*   display: flex; */
+/*   gap: 3rem; */
+/*   transform-style: preserve-3d; */
+/*   transition: transform 0.1s ease-out; */
+/* } */
+/**/
+/* .flat-card { */
+/*   background: white; */
+/*   border-radius: 10px; */
+/*   padding: 20px; */
+/*   width: 220px; */
+/*   height: 160px; */
+/*   box-shadow: 0 0 40px rgba(0, 0, 0, 0.3); */
+/*   text-align: center; */
+/*   transform: translateZ(30px); */
+/*   color: #010101; */
+/*   border: 1px solid #ccc; */
+/* } */
+
+.flat-gallery-wrapper {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  background: #E8D1A7;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  perspective: 1000px;
+  transform-style: preserve-3d;
+  transition: transform 0.1s ease-out;
+}
+
+.flat-gallery-container {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+}
+
+.flat-gallery {
+  display: flex;
+  gap: 2rem;
+  height: 100%;
+}
+
+.flat-card {
+  background: white;
+  border-radius: 10px;
+  padding: 20px;
+  width: 220px;
+  height: 160px;
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.3);
+  text-align: center;
+  color: #010101;
+}
+
+.nav-button {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(255,255,255,0.1);
+  border: none;
+  color: white;
+  font-size: 2rem;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  z-index: 10;
+  transition: background 0.2s ease;
+}
+
+.nav-button:hover {
+  background: rgba(255,255,255,0.3);
+}
+
+.nav-button.left {
+  left: 1rem;
+}
+
+.nav-button.right {
+  right: 1rem;
+}
