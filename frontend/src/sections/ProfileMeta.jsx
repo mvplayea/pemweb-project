@@ -173,27 +173,8 @@ const CardSubheading = styled.h3`
   margin-bottom: 1rem;
 `;
 
-const CodeCard = styled.div`
-  background-color: #1a1a1a;
-  border: 1px solid #333;
-  border-radius: 8px;
-  padding: 1.5rem;
-  font-family: 'Fira Code', 'Courier New', monospace;
-  font-size: 0.85rem;
-  line-height: 1.7;
-  white-space: pre-wrap;
-
-  span.comment { color: #6a9955; }
-  span.keyword { color: #569cd6; }
-  span.interface { color: #4ec9b0; }
-  span.string { color: #ce9178; }
-  span.bracket { color: #ffd700; }
-  span.prop { color: #9cdcfe; }
-`;
-
 const ImageCard = styled.div`
-  background-color: #222; /* Placeholder for the actual image */
-  background-image: url('https://i.imgur.com/kS5B34v.jpeg'); /* Using a placeholder image */
+  background-image: url('../assets/profile.jpg'); /* Using a placeholder image */
   background-size: cover;
   background-position: center;
   border-radius: 8px;
@@ -257,10 +238,6 @@ function App() {
               </Link>
             </HeroMainContent>
 
-            <FooterBar>
-              <CallToAction>Let's Talk</CallToAction>
-              <SearchIcon>&#x1F50D;</SearchIcon>
-            </FooterBar>
           </HeroSection>
 
           {/* --- Screen 2: What I do --- */}
@@ -272,8 +249,6 @@ function App() {
                 I creates memorable websites with smooth animations and interactive experiences.
               </SectionDescription>
 
-              <CardSubheading>3D Card Hover Effect</CardSubheading>
-              <CodeCard dangerouslySetInnerHTML={{ __html: codeSnippet }} />
             </LeftColumn>
 
             <RightColumn>

@@ -2,7 +2,10 @@ import React from 'react';
 import styled from 'styled-components';
 import { Parallax } from 'react-scroll-parallax';
 
-import profile from "../assets/Profile.jpg";
+import profile from "../assets/profile.jpg";
+import draw1 from "../assets/draws_1.jpg";
+import draw2 from "../assets/draws_2.jpg";
+import draw3 from "../assets/draws_3.webp";
 
 const GallerySection = styled.section`
   background-color: #000;
@@ -19,7 +22,7 @@ const GalleryContainer = styled.div`
 const ParallaxWrapper = styled.div`
   position: relative;
   width: 100%;
-  height: 90vh; // Adjust height to control the space for the effect
+  height: 100vh; // Adjust height to control the space for the effect
 `;
 
 // A generic container for any element we want to apply parallax to
@@ -92,7 +95,7 @@ const ParallaxGallery = () => {
             <Parallax speed={-15}>
               <ImageCard>
                 <SpeedTag style={{ transform: 'rotate(0)', left: '20px' }}>slow</SpeedTag>
-                <img src={profile} alt="Cyberpunk city" />
+                <img src={draw1} alt="art" />
               </ImageCard>
             </Parallax>
           </ParallaxElement>
@@ -102,17 +105,7 @@ const ParallaxGallery = () => {
             <Parallax speed={10}>
               <ImageCard>
                 <SpeedTag style={{ transform: 'rotate(0)', left: '20px' }}>fast</SpeedTag>
-                <img src={profile} alt="Neon street" />
-              </ImageCard>
-            </Parallax>
-          </ParallaxElement>
-
-          {/* Image 3 (Middle Right) */}
-          <ParallaxElement style={{ bottom: '25%', right: '15%', width: '20%', zIndex: 12 }}>
-            <Parallax speed={25}>
-              <ImageCard>
-                <SpeedTag style={{ transform: 'rotate(0)', left: '20px' }}>speedy</SpeedTag>
-                <img src="https://images.unsplash.com/photo-1570191973631-98b06387584e?w=800" alt="Rainy alley" />
+                <img src={draw3} alt="art" />
               </ImageCard>
             </Parallax>
           </ParallaxElement>
@@ -121,7 +114,7 @@ const ParallaxGallery = () => {
           <ParallaxElement style={{ bottom: '0', left: '45%', width: '30%', zIndex: 11 }}>
             <Parallax speed={-5}>
               <ImageCard>
-                <img src="https://images.unsplash.com/photo-1561575063-e0283c271542?w=800" alt="City lights" />
+                <img src={draw2} alt="art" />
               </ImageCard>
             </Parallax>
           </ParallaxElement>
