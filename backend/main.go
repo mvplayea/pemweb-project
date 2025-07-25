@@ -22,6 +22,7 @@ type Project struct {
 	Deadline        string `json:"deadline" db:"deadline"`
 	ReferenceFiles  string `json:"referenceFiles" db:"reference_files"`
 	AdditionalNotes string `json:"additionalNotes" db:"additional_notes"`
+	Status          string `json:"status" db:"status"` // New field for project status
 }
 
 type ProjectRequest struct {
@@ -36,6 +37,7 @@ type ProjectRequest struct {
 	Deadline        string   `json:"deadline"`
 	ReferenceFiles  string   `json:"referenceFiles"`
 	AdditionalNotes string   `json:"additionalNotes"`
+	Status          string   `json:"status"` // New field for project status
 }
 
 var db *sql.DB
@@ -61,6 +63,7 @@ func initDB() {
 		deadline TEXT,
 		reference_files TEXT,
 		additional_notes TEXT
+		status TEXT DEFAULT 'pending'
 	);`
 
 	_, err = db.Exec(createTable)
@@ -81,12 +84,12 @@ func createProject(c *gin.Context) {
 
 	query := `
 		INSERT INTO projects (client_name, email, phone, project_type, services, 
-		project_title, description, budget, deadline, reference_files, additional_notes)
-		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+		project_title, description, budget, deadline, reference_files, additional_notes, status)
+		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
 
 	result, err := db.Exec(query, req.ClientName, req.Email, req.Phone, req.ProjectType,
 		string(servicesJSON), req.ProjectTitle, req.Description, req.Budget,
-		req.Deadline, req.ReferenceFiles, req.AdditionalNotes)
+		req.Deadline, req.ReferenceFiles, req.AdditionalNotes, req.Status)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -110,7 +113,7 @@ func getProjects(c *gin.Context) {
 		var p Project
 		err := rows.Scan(&p.ID, &p.ClientName, &p.Email, &p.Phone, &p.ProjectType,
 			&p.Services, &p.ProjectTitle, &p.Description, &p.Budget,
-			&p.Deadline, &p.ReferenceFiles, &p.AdditionalNotes)
+			&p.Deadline, &p.ReferenceFiles, &p.AdditionalNotes, &p.Status)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return
@@ -133,6 +136,7 @@ func getProjects(c *gin.Context) {
 			"deadline":        p.Deadline,
 			"referenceFiles":  p.ReferenceFiles,
 			"additionalNotes": p.AdditionalNotes,
+			"status":          p.Status, // Include status in the response
 		}
 		projects = append(projects, project)
 	}
@@ -147,7 +151,7 @@ func getProject(c *gin.Context) {
 	err := db.QueryRow("SELECT * FROM projects WHERE id = ?", id).Scan(
 		&p.ID, &p.ClientName, &p.Email, &p.Phone, &p.ProjectType,
 		&p.Services, &p.ProjectTitle, &p.Description, &p.Budget,
-		&p.Deadline, &p.ReferenceFiles, &p.AdditionalNotes)
+		&p.Deadline, &p.ReferenceFiles, &p.AdditionalNotes, &p.Status)
 
 	if err == sql.ErrNoRows {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Project not found"})
@@ -172,9 +176,10 @@ func getProject(c *gin.Context) {
 		"projectTitle":    p.ProjectTitle,
 		"description":     p.Description,
 		"budget":          p.Budget,
-		"deadline":        p.deadline,
+		"deadline":        p.Deadline,
 		"referenceFiles":  p.ReferenceFiles,
 		"additionalNotes": p.AdditionalNotes,
+		"status":          p.Status, // Include status in the response
 	}
 
 	c.JSON(http.StatusOK, project)
@@ -193,12 +198,12 @@ func updateProject(c *gin.Context) {
 
 	query := `
 		UPDATE projects SET client_name=?, email=?, phone=?, project_type=?, services=?,
-		project_title=?, description=?, budget=?, deadline=?, reference_files=?, additional_notes=?
+		project_title=?, description=?, budget=?, deadline=?, reference_files=?, additional_notes=?, status=?
 		WHERE id=?`
 
 	result, err := db.Exec(query, req.ClientName, req.Email, req.Phone, req.ProjectType,
 		string(servicesJSON), req.ProjectTitle, req.Description, req.Budget,
-		req.Deadline, req.ReferenceFiles, req.AdditionalNotes, id)
+		req.Deadline, req.ReferenceFiles, req.AdditionalNotes, req.Status, id)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return

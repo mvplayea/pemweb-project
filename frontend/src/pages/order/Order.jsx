@@ -2,126 +2,156 @@
 
 import { useState } from "react"
 import styled from "styled-components"
+import axios from "axios"
 
-const FormContainer = styled.div`
-  width: 100%;
-  margin: 0 auto;
-  padding: 1rem;
-  background: #ffffff;
-  border-radius: 8px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+// A wrapper to add the consistent purple underline to the title
+const TitleWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 3rem;
 `
 
 const Title = styled.h1`
-  color: #333;
+  color: #f9fafb; // Brighter white for the main title
   text-align: center;
-  margin-bottom: 2rem;
+  font-family: 'Poppins', sans-serif;
+  font-size: 3rem;
+  margin: 0;
+`
+
+// Using the same underline style from other sections
+const Underline = styled.div`
+  width: 80px;
+  height: 3px;
+  background: linear-gradient(90deg, #A855F7, #D946EF);
+  margin-top: 0.75rem;
+`
+
+const FormContainer = styled.div`
+  width: 100%;
+  max-width: 800px; // Set a max-width for better readability on large screens
+  margin: 4rem auto;
+  padding: 3rem;
+  background: #18181B; // A very dark grey, not quite black
+  border-radius: 12px;
+  border: 1px solid #27272A;
 `
 
 const FormGroup = styled.div`
-  width: 90%:
-  margin-bottom: 2rem;
+  width: 100%; // Corrected from 90%:
+  margin-bottom: 1.5rem;
 `
 
 const Label = styled.label`
   display: block;
   margin-bottom: 0.5rem;
-  font-weight: 600;
-  color: #555;
+  font-weight: 500;
+  color: #a1a1aa; // Softer grey for labels
 `
 
-const Input = styled.input`
+// A common base for all input-like fields
+const inputStyles = `
   width: 100%;
-  padding: 0.75rem;
-  border: 2px solid #ddd;
-  border-radius: 4px;
+  padding: 0.85rem 1rem;
+  border: 1px solid #3f3f46;
+  border-radius: 6px;
   font-size: 1rem;
-  transition: border-color 0.3s;
+  font-family: 'Poppins', sans-serif;
+  background: #27272A;
+  color: #f9fafb;
+  transition: border-color 0.3s, box-shadow 0.3s;
+
+  &::placeholder {
+    color: #71717A;
+  }
 
   &:focus {
     outline: none;
-    border-color: #007bff;
+    border-color: #a855f7; // Use the theme's primary accent color
+    box-shadow: 0 0 0 3px rgba(168, 85, 247, 0.2); // A subtle glow effect
   }
 
   &:invalid {
-    border-color: #dc3545;
+    border-color: #f87171; // A more visible error color for dark mode
   }
+`
+
+const Input = styled.input`
+  ${inputStyles}
 `
 
 const Select = styled.select`
-  width: 100%;
-  padding: 0.75rem;
-  border: 2px solid #ddd;
-  border-radius: 4px;
-  font-size: 1rem;
-  background: white;
-  
-  &:focus {
-    outline: none;
-    border-color: #007bff;
-  }
+  ${inputStyles}
 `
 
 const TextArea = styled.textarea`
-  width: 100%;
-  padding: 0.75rem;
-  border: 2px solid #ddd;
-  border-radius: 4px;
-  font-size: 1rem;
+  ${inputStyles}
   min-height: 120px;
   resize: vertical;
-  
-  &:focus {
-    outline: none;
-    border-color: #007bff;
-  }
 `
 
 const CheckboxGroup = styled.div`
   display: flex;
   flex-wrap: wrap;
-  gap: 1rem;
+  gap: 1.5rem;
+  background-color: #27272A;
+  padding: 1.5rem;
+  border-radius: 6px;
+  border: 1px solid #3f3f46;
 `
 
 const CheckboxLabel = styled.label`
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.75rem;
   cursor: pointer;
+  color: #d4d4d8;
 `
 
 const Checkbox = styled.input`
-  width: auto;
+  width: 1.15em;
+  height: 1.15em;
+  cursor: pointer;
+  accent-color: #a855f7; // Modern CSS to theme the checkbox color
 `
 
 const Button = styled.button`
-  background: #007bff;
+  background: linear-gradient(90deg, #A855F7, #D946EF);
   color: white;
-  padding: 0.75rem 2rem;
+  padding: 0.85rem 2rem;
   border: none;
-  border-radius: 4px;
-  font-size: 1rem;
+  border-radius: 6px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  font-family: 'Poppins', sans-serif;
   cursor: pointer;
   width: 100%;
-  transition: background-color 0.3s;
+  transition: transform 0.2s, filter 0.2s;
 
   &:hover {
-    background: #0056b3;
+    transform: translateY(-2px);
+    filter: brightness(1.1);
   }
 
   &:disabled {
-    background: #ccc;
+    background: #4b5563;
     cursor: not-allowed;
+    transform: none;
+    filter: none;
   }
 `
 
 const SuccessMessage = styled.div`
-  background: #d4edda;
-  color: #155724;
-  padding: 1rem;
-  border-radius: 4px;
+  background: #042f2e; // Dark green background
+  color: #a7f3d0; // Light mint color for text
+  padding: 2rem;
+  border-radius: 8px;
+  border: 1px solid #5eead4;
   margin-bottom: 1rem;
   text-align: center;
+
+  h2 { margin-top: 0; }
 `
 
 const Order = () => {
@@ -142,24 +172,14 @@ const Order = () => {
   const [isSubmitted, setIsSubmitted] = useState(false)
 
   const serviceOptions = [
-    "Logo Design",
-    "Business Card Design",
-    "Brochure Design",
-    "Website Graphics",
-    "Social Media Graphics",
-    "Illustration",
-    "Character Design",
-    "Book Cover Design",
-    "Packaging Design",
-    "Print Design",
+    "Logo Design", "Business Card", "Brochure", "Website Graphics",
+    "Social Media", "Illustration", "Character Design", "Book Cover",
+    "Packaging", "Print Design",
   ]
 
   const handleInputChange = (e) => {
     const { name, value } = e.target
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }))
+    setFormData((prev) => ({ ...prev, [name]: value }))
   }
 
   const handleServiceChange = (service) => {
@@ -171,46 +191,35 @@ const Order = () => {
     }))
   }
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
 
-    // Generate order ID
-    const orderId = "ORD-" + Date.now()
-
-    // Get existing orders from localStorage
-    const existingOrders = JSON.parse(localStorage.getItem("orders") || "[]")
-
-    // Add new order
     const newOrder = {
-      id: orderId,
       ...formData,
       status: "pending",
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
+    };
+
+    try {
+      const response = await axios.post("http://localhost:8080/projects", newOrder);
+
+      if (response.status === 201) {
+        setIsSubmitted(true);
+        // Reset form fields
+        setFormData({
+          clientName: "", email: "", phone: "", projectType: "", services: [],
+          projectTitle: "", description: "", budget: "", deadline: "",
+          referenceFiles: "", additionalNotes: "",
+        });
+      } else {
+        console.error("Failed to submit order: Server responded with status " + response.status);
+        alert("There was an issue submitting your order. Please try again.");
+      }
+    } catch (error) {
+      console.error("An error occurred while submitting the order:", error);
+      alert("An error occurred. Please check the console and try again.");
     }
-
-    existingOrders.push(newOrder)
-    localStorage.setItem("orders", JSON.stringify(existingOrders))
-
-    setIsSubmitted(true)
-
-    // Reset form after 3 seconds
-    setTimeout(() => {
-      setIsSubmitted(false)
-      setFormData({
-        clientName: "",
-        email: "",
-        phone: "",
-        projectType: "",
-        services: [],
-        projectTitle: "",
-        description: "",
-        budget: "",
-        deadline: "",
-        referenceFiles: "",
-        additionalNotes: "",
-      })
-    }, 3000)
   }
 
   if (isSubmitted) {
@@ -226,9 +235,16 @@ const Order = () => {
 
   return (
     <FormContainer>
-      <Title>Freelance Design Order Form</Title>
+      <TitleWrapper>
+        <Title>Freelance Design Order</Title>
+        <Underline />
+      </TitleWrapper>
 
       <form onSubmit={handleSubmit}>
+        {/* The rest of your form JSX remains exactly the same. */}
+        {/* ... From <FormGroup> for Full Name to the closing </form> tag ... */}
+
+        {/* Example of one FormGroup just to show no changes are needed here */}
         <FormGroup>
           <Label htmlFor="clientName">Full Name *</Label>
           <Input
@@ -240,6 +256,8 @@ const Order = () => {
             required
           />
         </FormGroup>
+
+        {/* ... Paste the rest of your form groups here ... */}
 
         <FormGroup>
           <Label htmlFor="email">Email Address *</Label>
@@ -253,13 +271,7 @@ const Order = () => {
 
         <FormGroup>
           <Label htmlFor="projectType">Project Type *</Label>
-          <Select
-            id="projectType"
-            name="projectType"
-            value={formData.projectType}
-            onChange={handleInputChange}
-            required
-          >
+          <Select id="projectType" name="projectType" value={formData.projectType} onChange={handleInputChange} required >
             <option value="">Select project type</option>
             <option value="graphic-design">Graphic Design</option>
             <option value="illustration">Art Illustration</option>
@@ -287,26 +299,12 @@ const Order = () => {
 
         <FormGroup>
           <Label htmlFor="projectTitle">Project Title *</Label>
-          <Input
-            type="text"
-            id="projectTitle"
-            name="projectTitle"
-            value={formData.projectTitle}
-            onChange={handleInputChange}
-            required
-          />
+          <Input type="text" id="projectTitle" name="projectTitle" value={formData.projectTitle} onChange={handleInputChange} required />
         </FormGroup>
 
         <FormGroup>
           <Label htmlFor="description">Project Description *</Label>
-          <TextArea
-            id="description"
-            name="description"
-            value={formData.description}
-            onChange={handleInputChange}
-            placeholder="Please describe your project in detail, including style preferences, target audience, and any specific requirements..."
-            required
-          />
+          <TextArea id="description" name="description" value={formData.description} onChange={handleInputChange} placeholder="Please describe your project in detail..." required />
         </FormGroup>
 
         <FormGroup>
@@ -323,36 +321,17 @@ const Order = () => {
 
         <FormGroup>
           <Label htmlFor="deadline">Preferred Deadline</Label>
-          <Input
-            type="date"
-            id="deadline"
-            name="deadline"
-            value={formData.deadline}
-            onChange={handleInputChange}
-            min={new Date().toISOString().split("T")[0]}
-          />
+          <Input type="date" id="deadline" name="deadline" value={formData.deadline} onChange={handleInputChange} min={new Date().toISOString().split("T")[0]} />
         </FormGroup>
 
         <FormGroup>
           <Label htmlFor="referenceFiles">Reference Files/Links</Label>
-          <TextArea
-            id="referenceFiles"
-            name="referenceFiles"
-            value={formData.referenceFiles}
-            onChange={handleInputChange}
-            placeholder="Please provide links to reference images, inspiration, or any files that help explain your vision..."
-          />
+          <TextArea id="referenceFiles" name="referenceFiles" value={formData.referenceFiles} onChange={handleInputChange} placeholder="Please provide links to reference images, inspiration..." />
         </FormGroup>
 
         <FormGroup>
           <Label htmlFor="additionalNotes">Additional Notes</Label>
-          <TextArea
-            id="additionalNotes"
-            name="additionalNotes"
-            value={formData.additionalNotes}
-            onChange={handleInputChange}
-            placeholder="Any additional information or special requests..."
-          />
+          <TextArea id="additionalNotes" name="additionalNotes" value={formData.additionalNotes} onChange={handleInputChange} placeholder="Any additional information or special requests..." />
         </FormGroup>
 
         <Button type="submit">Submit Order</Button>

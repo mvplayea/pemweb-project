@@ -5,7 +5,7 @@ import BlurText from "./components/BlurText"
 import Threads from "./components/Threads"
 import StarBorder from "./components/StarBorder"
 
-import Profile from "./sections/Profile"
+import ProfileMeta from "./sections/ProfileMeta"
 import styled from "styled-components"
 
 const Opener = styled.div`
@@ -18,19 +18,19 @@ export default function App() {
   return (
     <>
       <div className="App">
-        {showOpener ? (
-          <Opener>
-            <BlurText
-              text="Welcome to the Gallery"
-              animateBy="words"
-              direction="top"
-              onAnimationComplete={() => setShowOpener(false)}
-              delay={200}
-            />
-          </Opener>
-        ) : (
-          <Profile />
-        )}
+        {/* {showOpener ? ( */}
+        {/*   <Opener> */}
+        {/*     <BlurText */}
+        {/*       text="Welcome to the Gallery" */}
+        {/*       animateBy="words" */}
+        {/*       direction="top" */}
+        {/*       onAnimationComplete={() => setShowOpener(false)} */}
+        {/*       delay={200} */}
+        {/*     /> */}
+        {/*   </Opener> */}
+        {/* ) : ( */}
+        <ProfileMeta />
+        {/* )} */}
       </div>
     </>
   )

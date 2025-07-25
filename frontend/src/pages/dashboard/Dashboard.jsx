@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react"
 import styled from "styled-components"
+import axios from "axios"
 
 const DashboardContainer = styled.div`
   width: 100%;
@@ -176,8 +177,15 @@ const AdminDashboard = ({ onLogout }) => {
     filterOrders()
   }, [orders, statusFilter])
 
-  const loadOrders = () => {
-    const storedOrders = JSON.parse(localStorage.getItem("orders") || "[]")
+  const loadOrders = async () => {
+    const response = await axios.get("http://localhost:8080/projects");
+    console.log(response.data)
+    const storedOrders = response.data.map((order) => ({
+      ...order,
+      createdAt: order.createdAt || new Date().toISOString(),
+      updatedAt: order.updatedAt || new Date().toISOString(),
+    }))
+
     setOrders(storedOrders)
   }
 
