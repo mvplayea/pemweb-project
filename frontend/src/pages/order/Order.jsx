@@ -202,7 +202,7 @@ const Order = () => {
     };
 
     try {
-      const response = await axios.post("https://api-alle.noxturne.my.id/projects", newOrder);
+      const response = await axios.post("http://localhost:8080/projects", newOrder);
 
       if (response.status === 201) {
         setIsSubmitted(true);
