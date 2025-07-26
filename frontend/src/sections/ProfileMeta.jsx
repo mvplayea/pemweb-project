@@ -28,6 +28,7 @@ const HeaderNav = styled.nav`
   display: flex;
   justify-content: space-between;
   align-items: center;
+  width: 90%;
 `;
 
 const Logo = styled.h1`
@@ -210,6 +211,15 @@ function App() {
 }
   `;
 
+  const Login = styled.div`
+    font-size: 1rem;
+    color: #A855F7;
+    cursor: pointer;
+    &:hover {
+      text-decoration: underline;
+    }
+  `;
+
   return (
     <>
       <ParallaxProvider>
@@ -221,6 +231,9 @@ function App() {
           <HeroSection>
             <HeaderNav>
               <Logo>Alle</Logo>
+              <Link to="/panel">
+                <Login>login demo</Login>
+              </Link>
             </HeaderNav>
 
             <HeroMainContent>
