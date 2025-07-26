@@ -178,7 +178,7 @@ const AdminDashboard = ({ onLogout }) => {
   }, [orders, statusFilter])
 
   const loadOrders = async () => {
-    const response = await axios.get("http://localhost:8080/projects");
+    const response = await axios.get("https://api-alle.noxturne.my.id/projects");
     console.log(response.data)
     const storedOrders = response.data.map((order) => ({
       ...order,
