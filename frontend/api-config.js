@@ -1,6 +1,6 @@
 
 export const API_CONFIG = {
-  baseUrl: "http://localhost:8080",
+  baseUrl: "https://api-alle.noxturne.my.id",
   endpoints: {
     orders: "/api/orders",
     orderById: (id) => `/api/orders/${id}`,
