@@ -2,232 +2,440 @@
 
 import { useState } from "react"
 import styled from "styled-components"
-import axios from "axios"
+import { API_CONFIG, apiCall } from "../../../api-config"
+import { initializeDummyData } from "../dashboard/dummy-data"
 
-// A wrapper to add the consistent purple underline to the title
-const TitleWrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin-bottom: 3rem;
+// Initialize dummy data when component loads
+initializeDummyData()
+
+const FormContainer = styled.div`
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 2rem;
+  background: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 `
 
 const Title = styled.h1`
-  color: #f9fafb; // Brighter white for the main title
+  color: #333;
   text-align: center;
-  font-family: 'Poppins', sans-serif;
-  font-size: 3rem;
-  margin: 0;
-`
-
-// Using the same underline style from other sections
-const Underline = styled.div`
-  width: 80px;
-  height: 3px;
-  background: linear-gradient(90deg, #A855F7, #D946EF);
-  margin-top: 0.75rem;
-`
-
-const FormContainer = styled.div`
-  width: 100%;
-  max-width: 800px; // Set a max-width for better readability on large screens
-  margin: 4rem auto;
-  padding: 3rem;
-  background: #18181B; // A very dark grey, not quite black
-  border-radius: 12px;
-  border: 1px solid #27272A;
+  margin-bottom: 2rem;
 `
 
 const FormGroup = styled.div`
-  width: 100%; // Corrected from 90%:
   margin-bottom: 1.5rem;
 `
 
 const Label = styled.label`
   display: block;
   margin-bottom: 0.5rem;
-  font-weight: 500;
-  color: #a1a1aa; // Softer grey for labels
-`
-
-// A common base for all input-like fields
-const inputStyles = `
-  width: 100%;
-  padding: 0.85rem 1rem;
-  border: 1px solid #3f3f46;
-  border-radius: 6px;
-  font-size: 1rem;
-  font-family: 'Poppins', sans-serif;
-  background: #27272A;
-  color: #f9fafb;
-  transition: border-color 0.3s, box-shadow 0.3s;
-
-  &::placeholder {
-    color: #71717A;
-  }
-
-  &:focus {
-    outline: none;
-    border-color: #a855f7; // Use the theme's primary accent color
-    box-shadow: 0 0 0 3px rgba(168, 85, 247, 0.2); // A subtle glow effect
-  }
-
-  &:invalid {
-    border-color: #f87171; // A more visible error color for dark mode
-  }
+  font-weight: 600;
+  color: #555;
 `
 
 const Input = styled.input`
-  ${inputStyles}
+  width: 100%;
+  padding: 0.75rem;
+  border: 2px solid #ddd;
+  border-radius: 4px;
+  font-size: 1rem;
+  transition: border-color 0.3s;
+
+  &:focus {
+    outline: none;
+    border-color: #007bff;
+  }
+
+  &:invalid {
+    border-color: #dc3545;
+  }
 `
 
 const Select = styled.select`
-  ${inputStyles}
+  width: 100%;
+  padding: 0.75rem;
+  border: 2px solid #ddd;
+  border-radius: 4px;
+  font-size: 1rem;
+  background: white;
+  
+  &:focus {
+    outline: none;
+    border-color: #007bff;
+  }
 `
 
 const TextArea = styled.textarea`
-  ${inputStyles}
+  width: 100%;
+  padding: 0.75rem;
+  border: 2px solid #ddd;
+  border-radius: 4px;
+  font-size: 1rem;
   min-height: 120px;
   resize: vertical;
+  
+  &:focus {
+    outline: none;
+    border-color: #007bff;
+  }
 `
 
 const CheckboxGroup = styled.div`
   display: flex;
   flex-wrap: wrap;
-  gap: 1.5rem;
-  background-color: #27272A;
-  padding: 1.5rem;
-  border-radius: 6px;
-  border: 1px solid #3f3f46;
+  gap: 1rem;
 `
 
 const CheckboxLabel = styled.label`
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  gap: 0.5rem;
   cursor: pointer;
-  color: #d4d4d8;
 `
 
 const Checkbox = styled.input`
-  width: 1.15em;
-  height: 1.15em;
+  width: auto;
+`
+
+const FileUpload = styled.input`
+  width: 100%;
+  padding: 0.75rem;
+  border: 2px dashed #ddd;
+  border-radius: 4px;
+  background: #f8f9fa;
   cursor: pointer;
-  accent-color: #a855f7; // Modern CSS to theme the checkbox color
+  
+  &:focus {
+    outline: none;
+    border-color: #007bff;
+  }
 `
 
 const Button = styled.button`
-  background: linear-gradient(90deg, #A855F7, #D946EF);
+  background: #007bff;
   color: white;
-  padding: 0.85rem 2rem;
+  padding: 0.75rem 2rem;
   border: none;
-  border-radius: 6px;
-  font-size: 1.1rem;
-  font-weight: 600;
-  font-family: 'Poppins', sans-serif;
+  border-radius: 4px;
+  font-size: 1rem;
   cursor: pointer;
   width: 100%;
-  transition: transform 0.2s, filter 0.2s;
+  transition: background-color 0.3s;
 
   &:hover {
-    transform: translateY(-2px);
-    filter: brightness(1.1);
+    background: #0056b3;
   }
 
   &:disabled {
-    background: #4b5563;
+    background: #ccc;
     cursor: not-allowed;
-    transform: none;
-    filter: none;
   }
 `
 
 const SuccessMessage = styled.div`
-  background: #042f2e; // Dark green background
-  color: #a7f3d0; // Light mint color for text
-  padding: 2rem;
-  border-radius: 8px;
-  border: 1px solid #5eead4;
+  background: #d4edda;
+  color: #155724;
+  padding: 1rem;
+  border-radius: 4px;
   margin-bottom: 1rem;
   text-align: center;
-
-  h2 { margin-top: 0; }
 `
 
-const Order = () => {
+const ErrorMessage = styled.div`
+  background: #f8d7da;
+  color: #721c24;
+  padding: 1rem;
+  border-radius: 4px;
+  margin-bottom: 1rem;
+  text-align: center;
+`
+
+const LoadingSpinner = styled.div`
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  border: 3px solid #ffffff;
+  border-radius: 50%;
+  border-top-color: transparent;
+  animation: spin 1s ease-in-out infinite;
+  margin-right: 10px;
+
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+`
+
+const PriorityBadge = styled.span`
+  display: inline-block;
+  padding: 0.25rem 0.5rem;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  margin-left: 0.5rem;
+  
+  ${(props) => {
+    switch (props.priority) {
+      case "urgent":
+        return "background: #dc3545; color: white;"
+      case "high":
+        return "background: #fd7e14; color: white;"
+      case "normal":
+        return "background: #28a745; color: white;"
+      case "low":
+        return "background: #6c757d; color: white;"
+      default:
+        return "background: #e9ecef; color: #495057;"
+    }
+  }}
+`
+
+const ApiStatusIndicator = styled.div`
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  z-index: 1000;
+  
+  ${(props) => {
+    switch (props.status) {
+      case "api":
+        return "background: #d4edda; color: #155724;"
+      case "local":
+        return "background: #fff3cd; color: #856404;"
+      case "error":
+        return "background: #f8d7da; color: #721c24;"
+      default:
+        return "background: #e2e3e5; color: #383d41;"
+    }
+  }}
+`
+
+// Utility functions for null safety
+const safeString = (value) => value || ""
+const safeArray = (value) => (Array.isArray(value) ? value : [])
+
+const OrderForm = () => {
   const [formData, setFormData] = useState({
     clientName: "",
     email: "",
     phone: "",
+    company: "",
     projectType: "",
     services: [],
     projectTitle: "",
     description: "",
     budget: "",
     deadline: "",
-    referenceFiles: "",
+    priority: "normal",
+    referenceFiles: null,
     additionalNotes: "",
+    communicationPreference: "email",
+    revisionRounds: "3",
+    fileFormat: [],
+    colorPreferences: "",
+    targetAudience: "",
   })
 
-  const [isSubmitted, setIsSubmitted] = useState(false)
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [submitStatus, setSubmitStatus] = useState(null)
+  const [errorMessage, setErrorMessage] = useState("")
+  const [dataSource, setDataSource] = useState("unknown")
 
   const serviceOptions = [
-    "Logo Design", "Business Card", "Brochure", "Website Graphics",
-    "Social Media", "Illustration", "Character Design", "Book Cover",
-    "Packaging", "Print Design",
+    "Logo Design",
+    "Business Card Design",
+    "Brochure Design",
+    "Website Graphics",
+    "Social Media Graphics",
+    "Illustration",
+    "Character Design",
+    "Book Cover Design",
+    "Packaging Design",
+    "Print Design",
   ]
 
+  const fileFormatOptions = ["PNG", "JPG", "SVG", "PDF", "AI", "PSD", "EPS"]
+
   const handleInputChange = (e) => {
-    const { name, value } = e.target
-    setFormData((prev) => ({ ...prev, [name]: value }))
+    const { name, value, type, files } = e.target
+
+    if (type === "file") {
+      setFormData((prev) => ({
+        ...prev,
+        [name]: files && files[0] ? files[0] : null,
+      }))
+    } else {
+      setFormData((prev) => ({
+        ...prev,
+        [name]: safeString(value),
+      }))
+    }
   }
 
   const handleServiceChange = (service) => {
     setFormData((prev) => ({
       ...prev,
-      services: prev.services.includes(service)
-        ? prev.services.filter((s) => s !== service)
-        : [...prev.services, service],
+      services: safeArray(prev.services).includes(service)
+        ? safeArray(prev.services).filter((s) => s !== service)
+        : [...safeArray(prev.services), service],
     }))
+  }
+
+  const handleFileFormatChange = (format) => {
+    setFormData((prev) => ({
+      ...prev,
+      fileFormat: safeArray(prev.fileFormat).includes(format)
+        ? safeArray(prev.fileFormat).filter((f) => f !== format)
+        : [...safeArray(prev.fileFormat), format],
+    }))
+  }
+
+  const submitToAPI = async (orderData) => {
+    try {
+      const result = await apiCall(API_CONFIG.endpoints.orders, {
+        method: "POST",
+        body: JSON.stringify(orderData),
+      })
+
+      if (result && result.success) {
+        setDataSource("api")
+        return result
+      } else {
+        throw new Error(result?.message || "API submission failed")
+      }
+    } catch (error) {
+      console.warn("API submission failed:", error.message)
+      throw error
+    }
+  }
+
+  const submitToLocalStorage = (orderData) => {
+    try {
+      const orderId = "ORD-" + Date.now()
+      const existingOrders = JSON.parse(localStorage.getItem("orders") || "[]")
+
+      const newOrder = {
+        id: orderId,
+        ...orderData,
+        status: "pending",
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      }
+
+      existingOrders.push(newOrder)
+      localStorage.setItem("orders", JSON.stringify(existingOrders))
+      setDataSource("local")
+
+      return {
+        success: true,
+        data: newOrder,
+        message: "Order saved locally",
+      }
+    } catch (error) {
+      console.error("Local storage failed:", error)
+      throw error
+    }
   }
 
   const handleSubmit = async (e) => {
     e.preventDefault()
-
-    const newOrder = {
-      ...formData,
-      status: "pending",
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    };
+    setIsSubmitting(true)
+    setSubmitStatus(null)
+    setErrorMessage("")
 
     try {
-      const response = await axios.post("https://api-alle.noxturne.my.id/projects", newOrder);
+      // Normalize form data with null safety
+      const orderData = {
+        clientName: safeString(formData.clientName),
+        email: safeString(formData.email),
+        phone: safeString(formData.phone),
+        company: safeString(formData.company),
+        projectType: safeString(formData.projectType),
+        services: safeArray(formData.services),
+        projectTitle: safeString(formData.projectTitle),
+        description: safeString(formData.description),
+        budget: safeString(formData.budget),
+        deadline: safeString(formData.deadline),
+        priority: safeString(formData.priority) || "normal",
+        communicationPreference: safeString(formData.communicationPreference) || "email",
+        revisionRounds: safeString(formData.revisionRounds) || "3",
+        fileFormat: safeArray(formData.fileFormat),
+        colorPreferences: safeString(formData.colorPreferences),
+        targetAudience: safeString(formData.targetAudience),
+        additionalNotes: safeString(formData.additionalNotes),
+      }
 
-      if (response.status === 201) {
-        setIsSubmitted(true);
-        // Reset form fields
-        setFormData({
-          clientName: "", email: "", phone: "", projectType: "", services: [],
-          projectTitle: "", description: "", budget: "", deadline: "",
-          referenceFiles: "", additionalNotes: "",
-        });
+      let result
+
+      if (API_CONFIG.useAPI) {
+        try {
+          // Try API first
+          result = await submitToAPI(orderData)
+        } catch (apiError) {
+          console.warn("API failed, falling back to localStorage:", apiError.message)
+          // Fallback to localStorage
+          result = submitToLocalStorage(orderData)
+        }
       } else {
-        console.error("Failed to submit order: Server responded with status " + response.status);
-        alert("There was an issue submitting your order. Please try again.");
+        // Use localStorage only
+        result = submitToLocalStorage(orderData)
+      }
+
+      if (result && result.success) {
+        setSubmitStatus("success")
+
+        // Reset form after 3 seconds
+        setTimeout(() => {
+          setSubmitStatus(null)
+          setFormData({
+            clientName: "",
+            email: "",
+            phone: "",
+            company: "",
+            projectType: "",
+            services: [],
+            projectTitle: "",
+            description: "",
+            budget: "",
+            deadline: "",
+            priority: "normal",
+            referenceFiles: null,
+            additionalNotes: "",
+            communicationPreference: "email",
+            revisionRounds: "3",
+            fileFormat: [],
+            colorPreferences: "",
+            targetAudience: "",
+          })
+          setDataSource("unknown")
+        }, 3000)
+      } else {
+        throw new Error("Submission failed")
       }
     } catch (error) {
-      console.error("An error occurred while submitting the order:", error);
-      alert("An error occurred. Please check the console and try again.");
+      setSubmitStatus("error")
+      setErrorMessage(error.message || "Failed to submit order")
+      setDataSource("error")
+    } finally {
+      setIsSubmitting(false)
     }
   }
 
-  if (isSubmitted) {
+  if (submitStatus === "success") {
     return (
       <FormContainer>
+        <ApiStatusIndicator status={dataSource}>
+          {dataSource === "api" ? "✓ Saved to API" : dataSource === "local" ? "✓ Saved Locally" : "✓ Saved"}
+        </ApiStatusIndicator>
         <SuccessMessage>
           <h2>Order Submitted Successfully!</h2>
           <p>Thank you for your order. We'll get back to you soon.</p>
+          <p>
+            <small>Data source: {dataSource === "api" ? "API Server" : "Local Storage"}</small>
+          </p>
         </SuccessMessage>
       </FormContainer>
     )
@@ -235,43 +443,72 @@ const Order = () => {
 
   return (
     <FormContainer>
-      <TitleWrapper>
-        <Title>Freelance Design Order</Title>
-        <Underline />
-      </TitleWrapper>
+      {dataSource !== "unknown" && (
+        <ApiStatusIndicator status={dataSource}>
+          {dataSource === "api"
+            ? "API Connected"
+            : dataSource === "local"
+              ? "Using Local Storage"
+              : dataSource === "error"
+                ? "Connection Error"
+                : ""}
+        </ApiStatusIndicator>
+      )}
+
+      <Title>Freelance Design Order Form</Title>
+
+      {submitStatus === "error" && <ErrorMessage>Error: {errorMessage}</ErrorMessage>}
 
       <form onSubmit={handleSubmit}>
-        {/* The rest of your form JSX remains exactly the same. */}
-        {/* ... From <FormGroup> for Full Name to the closing </form> tag ... */}
-
-        {/* Example of one FormGroup just to show no changes are needed here */}
         <FormGroup>
           <Label htmlFor="clientName">Full Name *</Label>
           <Input
             type="text"
             id="clientName"
             name="clientName"
-            value={formData.clientName}
+            value={safeString(formData.clientName)}
             onChange={handleInputChange}
             required
           />
         </FormGroup>
 
-        {/* ... Paste the rest of your form groups here ... */}
-
         <FormGroup>
           <Label htmlFor="email">Email Address *</Label>
-          <Input type="email" id="email" name="email" value={formData.email} onChange={handleInputChange} required />
+          <Input
+            type="email"
+            id="email"
+            name="email"
+            value={safeString(formData.email)}
+            onChange={handleInputChange}
+            required
+          />
         </FormGroup>
 
         <FormGroup>
           <Label htmlFor="phone">Phone Number</Label>
-          <Input type="tel" id="phone" name="phone" value={formData.phone} onChange={handleInputChange} />
+          <Input type="tel" id="phone" name="phone" value={safeString(formData.phone)} onChange={handleInputChange} />
+        </FormGroup>
+
+        <FormGroup>
+          <Label htmlFor="company">Company/Organization</Label>
+          <Input
+            type="text"
+            id="company"
+            name="company"
+            value={safeString(formData.company)}
+            onChange={handleInputChange}
+          />
         </FormGroup>
 
         <FormGroup>
           <Label htmlFor="projectType">Project Type *</Label>
-          <Select id="projectType" name="projectType" value={formData.projectType} onChange={handleInputChange} required >
+          <Select
+            id="projectType"
+            name="projectType"
+            value={safeString(formData.projectType)}
+            onChange={handleInputChange}
+            required
+          >
             <option value="">Select project type</option>
             <option value="graphic-design">Graphic Design</option>
             <option value="illustration">Art Illustration</option>
@@ -288,7 +525,7 @@ const Order = () => {
               <CheckboxLabel key={service}>
                 <Checkbox
                   type="checkbox"
-                  checked={formData.services.includes(service)}
+                  checked={safeArray(formData.services).includes(service)}
                   onChange={() => handleServiceChange(service)}
                 />
                 {service}
@@ -299,17 +536,92 @@ const Order = () => {
 
         <FormGroup>
           <Label htmlFor="projectTitle">Project Title *</Label>
-          <Input type="text" id="projectTitle" name="projectTitle" value={formData.projectTitle} onChange={handleInputChange} required />
+          <Input
+            type="text"
+            id="projectTitle"
+            name="projectTitle"
+            value={safeString(formData.projectTitle)}
+            onChange={handleInputChange}
+            required
+          />
+        </FormGroup>
+
+        <FormGroup>
+          <Label htmlFor="priority">
+            Priority Level *
+            <PriorityBadge priority={safeString(formData.priority) || "normal"}>
+              {(safeString(formData.priority) || "normal").toUpperCase()}
+            </PriorityBadge>
+          </Label>
+          <Select
+            id="priority"
+            name="priority"
+            value={safeString(formData.priority) || "normal"}
+            onChange={handleInputChange}
+            required
+          >
+            <option value="low">Low Priority</option>
+            <option value="normal">Normal Priority</option>
+            <option value="high">High Priority</option>
+            <option value="urgent">Urgent</option>
+          </Select>
         </FormGroup>
 
         <FormGroup>
           <Label htmlFor="description">Project Description *</Label>
-          <TextArea id="description" name="description" value={formData.description} onChange={handleInputChange} placeholder="Please describe your project in detail..." required />
+          <TextArea
+            id="description"
+            name="description"
+            value={safeString(formData.description)}
+            onChange={handleInputChange}
+            placeholder="Please describe your project in detail, including style preferences, target audience, and any specific requirements..."
+            required
+          />
+        </FormGroup>
+
+        <FormGroup>
+          <Label htmlFor="targetAudience">Target Audience</Label>
+          <Input
+            type="text"
+            id="targetAudience"
+            name="targetAudience"
+            value={safeString(formData.targetAudience)}
+            onChange={handleInputChange}
+            placeholder="e.g., Young professionals, Tech startups, Healthcare industry"
+          />
+        </FormGroup>
+
+        <FormGroup>
+          <Label htmlFor="colorPreferences">Color Preferences</Label>
+          <Input
+            type="text"
+            id="colorPreferences"
+            name="colorPreferences"
+            value={safeString(formData.colorPreferences)}
+            onChange={handleInputChange}
+            placeholder="e.g., Blue and white, Warm colors, Corporate colors"
+          />
+        </FormGroup>
+
+        <FormGroup>
+          <Label>Required File Formats</Label>
+          <CheckboxGroup>
+            {fileFormatOptions.map((format) => (
+              <CheckboxLabel key={format}>
+                <Checkbox
+                  type="checkbox"
+                  checked={safeArray(formData.fileFormat).includes(format)}
+                  onChange={() => handleFileFormatChange(format)}
+                />
+                {format}
+              </CheckboxLabel>
+            ))}
+          </CheckboxGroup>
         </FormGroup>
 
         <FormGroup>
           <Label htmlFor="budget">Budget Range *</Label>
-          <Select id="budget" name="budget" value={formData.budget} onChange={handleInputChange} required>
+          <Select id="budget" name="budget" value={safeString(formData.budget)} onChange={handleInputChange} required>
             <option value="">Select budget range</option>
             <option value="under-500">Under $500</option>
             <option value="500-1000">$500 - $1,000</option>
@@ -320,24 +632,78 @@ const Order = () => {
         </FormGroup>
 
         <FormGroup>
-          <Label htmlFor="deadline">Preferred Deadline</Label>
-          <Input type="date" id="deadline" name="deadline" value={formData.deadline} onChange={handleInputChange} min={new Date().toISOString().split("T")[0]} />
+          <Label htmlFor="revisionRounds">Number of Revision Rounds</Label>
+          <Select
+            id="revisionRounds"
+            name="revisionRounds"
+            value={safeString(formData.revisionRounds) || "3"}
+            onChange={handleInputChange}
+          >
+            <option value="1">1 Revision</option>
+            <option value="2">2 Revisions</option>
+            <option value="3">3 Revisions</option>
+            <option value="5">5 Revisions</option>
+            <option value="unlimited">Unlimited Revisions</option>
+          </Select>
         </FormGroup>
 
         <FormGroup>
-          <Label htmlFor="referenceFiles">Reference Files/Links</Label>
-          <TextArea id="referenceFiles" name="referenceFiles" value={formData.referenceFiles} onChange={handleInputChange} placeholder="Please provide links to reference images, inspiration..." />
+          <Label htmlFor="deadline">Preferred Deadline</Label>
+          <Input
+            type="date"
+            id="deadline"
+            name="deadline"
+            value={safeString(formData.deadline)}
+            onChange={handleInputChange}
+            min={new Date().toISOString().split("T")[0]}
+          />
+        </FormGroup>
+
+        <FormGroup>
+          <Label htmlFor="communicationPreference">Communication Preference</Label>
+          <Select
+            id="communicationPreference"
+            name="communicationPreference"
+            value={safeString(formData.communicationPreference) || "email"}
+            onChange={handleInputChange}
+          >
+            <option value="email">Email</option>
+            <option value="phone">Phone</option>
+            <option value="video-call">Video Call</option>
+            <option value="messaging">Messaging App</option>
+          </Select>
+        </FormGroup>
+
+        <FormGroup>
+          <Label htmlFor="referenceFiles">Reference Files</Label>
+          <FileUpload
+            type="file"
+            id="referenceFiles"
+            name="referenceFiles"
+            onChange={handleInputChange}
+            accept="image/*,.pdf,.doc,.docx"
+            multiple
+          />
         </FormGroup>
 
         <FormGroup>
           <Label htmlFor="additionalNotes">Additional Notes</Label>
-          <TextArea id="additionalNotes" name="additionalNotes" value={formData.additionalNotes} onChange={handleInputChange} placeholder="Any additional information or special requests..." />
+          <TextArea
+            id="additionalNotes"
+            name="additionalNotes"
+            value={safeString(formData.additionalNotes)}
+            onChange={handleInputChange}
+            placeholder="Any additional information or special requests..."
+          />
         </FormGroup>
 
-        <Button type="submit">Submit Order</Button>
+        <Button type="submit" disabled={isSubmitting}>
+          {isSubmitting && <LoadingSpinner />}
+          {isSubmitting ? "Submitting Order..." : "Submit Order"}
+        </Button>
       </form>
     </FormContainer>
   )
 }
 
-export default Order
+export default OrderForm

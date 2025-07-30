@@ -29,6 +29,7 @@ const HeaderNav = styled.nav`
   justify-content: space-between;
   align-items: center;
   width: 90%;
+  z-index: 10;
 `;
 
 const Logo = styled.h1`
